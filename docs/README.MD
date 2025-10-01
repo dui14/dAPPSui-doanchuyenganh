@@ -1,16 +1,16 @@
 ## Đề tài: Xây dựng dApp lưu trữ dữ liệu phi tập trung tích hợp Token Economy trên Sui Blockchain
 
-Kiến trúc tổng quan dApp (app.abc.xyz)
+Kiến trúc tổng quan dự kiến dApp (app.ark.xyz)
 1. Login (Kết nối ví Sui)
 •	Dùng Sui.js SDK hoặc wallet adapter (Ethos, Suiet, Sui Wallet) để login.
 •	Sau khi login, hệ thống lấy:
 o	Địa chỉ ví.
-o	Balance token (SUI, USDC testnet, ABC).
+o	Balance token (SUI, USDC testnet, ARK).
 •	Sign ví, tạo account id duy nhất cho user.
 
 2. Home
 •	File list: hiển thị file user đã upload (metadata lấy từ DB).
-•	Asset info: balance token SUI, USDC, ABC + giá trị LP đang cung cấp.
+•	Asset info: balance token SUI, USDC, ARK + giá trị LP đang cung cấp.
 •	Chart & Swap tool:
 o	Chart dùng Recharts/Chart.js để vẽ, hiển thị giá token dùng CoinGecko API hoặc CoinMarketCap API
 o	Swap tool: cài widget của flowx (https://testnet.flowx.finance/)
@@ -19,16 +19,16 @@ o	Swap tool: cài widget của flowx (https://testnet.flowx.finance/)
 •	Add liquidity vào pool SUI–USDC (smart contract Move).
 •	Smart contract sẽ:
 o	Mint LP token cho user (ví dụ LP-SUIUSDC).
-o	Ví dụ logic: Cho phép claim reward ABC dựa trên công thức 
-	Nếu pool < 10 SUI-USDC → 1 ABC/ngày.
+o	Ví dụ logic: Cho phép claim reward ARK dựa trên công thức 
+	Nếu pool < 10 SUI-USDC → 1 ARK/ngày.
 	Nếu pool ≥ 10 → reward giảm theo %.
 •	UI hiển thị:
 o	Liquidity user đang cung cấp.
-o	Reward ABC có thể claim.
+o	Reward ARK có thể claim.
 
 4. File
 •	2 lựa chọn mua gói:
-1.	Bằng ABC (token dự án).
+1.	Bằng ARK (token dự án).
 2.	Bằng SUI (native coin, testnet/mainnet).
 •	Tạo vault (luồng hoạt động bên dưới)
 •	Xóa file:
@@ -42,8 +42,8 @@ o	Xóa record trong DB.
 •	Frontend: React/Next.js + TailwindCSS.
 •	Blockchain (Sui Testnet):
 o	Move contract cho:
-	Fungible Token (ABC).
-	Liquidity Mining (reward ABC).
+	Fungible Token (ARK).
+	Liquidity Mining (reward ARK).
 	Vault Object (gói lưu trữ).
 o	Sui.js để kết nối ví + gọi contract.
 •	Storage:
