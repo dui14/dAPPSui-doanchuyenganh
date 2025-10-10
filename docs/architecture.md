@@ -1,53 +1,65 @@
-dapp-sui-storage/
+dapp-sui/
 │
-├── public/                  # Next.js + Tailwind
-│   ├── pages/
-│   │   ├── index.tsx          # Home
-│   │   ├── login.tsx          # Login page
-│   │   ├── earn.tsx           # Earn page
-│   │   ├── file.tsx           # File management
-│   │   ├── account.tsx        # Account info
-│   │   ├── _app.tsx           # Provider 
-│   │
-│   ├── components/
-│   │   ├── walletconnet.tsx  # Connect Sui wallet
-│   │   ├── flielist.tsx
-│   │   ├── asset.tsx
-│   │   ├── chart.tsx
-│   │   ├── swap.tsx
-│   │   ├── liquidity.tsx
-│   │   └── Vault.tsx
-│   │
-│   ├── utils/
-│   │   ├── sui.ts             # Sui.js SDK config
-│   │   ├── api.ts             # Call backend API
-│   │   └── chartApi.ts        # Fetch token price
-│   │
-│   └── styles/                # Tailwind custom styles
+├── public/
 │
-├── contracts/                 # Move contracts
-│   ├── ABC/                   # Fungible token
-│   ├── liquidity/             # Liquidity mining
-│   └── vault/                 # Storage Vault
+├── pages/
+│   ├── index.tsx           # Landing / Home
 │
-├ backend                # Node.js/Express
+│   ├── admin/
+│   │   ├── root.tsx        # Admin Root (Bộ)
+│   │   ├── org.tsx         # Org (Trường)
+│   │   └── admin_org.tsx      # Admin (Trường)
+│
+│   ├── user.tsx            # User (Sinh viên)
+│
+│   ├── verify.tsx          # Public verify / explorer
+│
+│   ├── login.tsx           # Login / Wallet connect
+│   ├── _app.tsx            # Provider, Layout
+│
+│
+├── components/
+│   ├── walletconnect.tsx       # Kết nối Sui wallet
+│   ├── certificate_list.tsx    # Hiển thị danh sách các chứng chỉ theo từng vai trò
+│   ├── table.tsx               # Bảng quản lý phân quyền
+│   ├── request.tsx             # Thẻ hiển thị yêu cầu cấp chứng chỉ
+│   ├── approve.tsx             # Modal popup để phê duyệt chứng chỉ
+│   ├── create.tsx              # Tạo chứng chỉ request 
+│   └── verify_input.tsx        # Input form cho Verifier
+│
+├── utils/
+│   ├── sui.ts              # Sui.js SDK config
+│   ├── api.ts              # Call backend API
+│   └── ipfs.ts             # Upload IPFS (nếu cần)
+│
+├── styles/                 # TailwindCSS
+│
+├── contracts/              # Move modules
+│   ├── token/
+│   │   └── cer_token.move
+│   ├── certificate.move
+│   └── org/
+│       └── org_registry.move
+│
+├backend             # Node.js / Express (giữ nguyên style cũ)
 │   ├── src/
 │   │   ├── routes/
-│   │   │   ├── file.js        # Upload, delete, metadata
-│   │   │   └── vault.js       # Vault management
+│   │   │   ├── certificate.js   # Upload file, metadata, create request
+│   │   │   ├── verify.js        # Truy vấn chứng chỉ
+│   │   │   └── org.js           # Quản lý org
 │   │   ├── services/
-│   │   │   ├── ipfs.js        # Upload to IPFS
-│   │   │   ├── encrypt.js     # AES encryption
-│   │   │   └── db.js          # DB connection
-│   │   └── app.js             # Express init
-│   │
-│   └── package.json
+│   │   │   ├── ipfs.js
+│   │   │   ├── db.js
+│   │   │   └── sign.js          # Ký metadata, handle signature
+│   │   └── app.js
+│   ├── package.json
 │
 ├── database/
-│   ├── schema.sql             # Nếu dùng Postgres
-│   └── models/                # ORM (Sequelize/Mongoose)
+│   ├── schema.sql          
+│   └── models/
 │
-└── docs/                      # Tài liệu nhóm
+└── docs/
     ├── architecture.md
-    ├── api-design.md
-    └── readme.md
+    ├── flow.md
+    ├── readme.md
+    └── api-design.md

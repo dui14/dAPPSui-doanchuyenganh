@@ -1,6 +1,6 @@
 /*
-/// Module: liq
-module liq::liq;
+/// Module: certificate
+module certificate::certificate;
 */
 
 // For Move coding conventions, see
