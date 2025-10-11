@@ -1,5 +1,6 @@
 # Đề tài: Xây dựng hệ thống quản lý và xác thực chứng chỉ học tập phi tập trung trên Sui Blockchain
-
+1. Tree
+/docs/architecture.md
 
 # Cài package va SUI CLI
 1. SUI CLI (https://docs.sui.io/guides/developer/getting-started)
@@ -12,6 +13,7 @@ npm install
 
 3. Sau khi cài kiểm tra
 npm list
+
 suistorage@1.0.0 D:\AppDev\code\suistorage\public
 ├── @mysten/dapp-kit@0.14.53
 ├── @mysten/sui@1.38.0

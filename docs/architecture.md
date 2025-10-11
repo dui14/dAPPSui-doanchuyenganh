@@ -25,6 +25,7 @@ dapp-sui/
 │   ├── request.tsx             # Thẻ hiển thị yêu cầu cấp chứng chỉ
 │   ├── approve.tsx             # Modal popup để phê duyệt chứng chỉ
 │   ├── create.tsx              # Tạo chứng chỉ request 
+│   ├── account.tsx             # Hiển thị tài khoản liên kết
 │   └── verify_input.tsx        # Input form cho Verifier
 │
 ├── utils/
@@ -37,8 +38,10 @@ dapp-sui/
 ├── contracts/              # Move modules
 │   ├── token/
 │   │   └── cer_token.move
-│   ├── certificate.move
-│   └── org/
+│   ├── cert/
+│   │   ├── certificate.move
+│   │   └── certificate_request.move
+│   ├── org/
 │       └── org_registry.move
 │
 ├backend             # Node.js / Express (giữ nguyên style cũ)
