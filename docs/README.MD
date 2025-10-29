@@ -32,17 +32,16 @@ npm list
 └── typescript@5.9.2
 
 4. Cài đặt Dynamic SDK
-- Tạo suidapp\public\.env.local
-NEXT_PUBLIC_DYNAMIC_ENV_ID=7e2c57a4-316f-467f-b11a-cafc5df99993
-NEXT_PUBLIC_API_URL=http://localhost:5000
+Tạo suidapp\public\.env.local
+- NEXT_PUBLIC_DYNAMIC_ENV_ID=7e2c57a4-316f-467f-b11a-cafc5df99993
+- NEXT_PUBLIC_API_URL=http://localhost:5000
 
-- Tạo \suidapp\.env
-PORT=5000
-FRONTEND_URL=http://localhost:3000
+Tạo \suidapp\.env
+- PORT=5000
+- FRONTEND_URL=http://localhost:3000
+- DB_USER=your_user
+- DB_PASSWORD=your_password
+- DB_SERVER=localhost
+- DB_NAME=your_database
 
-DB_USER=your_user
-DB_PASSWORD=your_password
-DB_SERVER=localhost
-DB_NAME=your_database
-
-JWT_PUBLIC_KEY_URL=https://app.dynamic.xyz/api/v0/sdk/7e2c57a4-316f-467f-b11a-cafc5df99993/.well-known/jwks
++ JWT_PUBLIC_KEY_URL=https://app.dynamic.xyz/api/v0/sdk/7e2c57a4-316f-467f-b11a-cafc5df99993/.well-known/jwks
