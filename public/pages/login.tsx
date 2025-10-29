@@ -1,20 +1,68 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, getAuthToken } from '@dynamic-labs/sdk-react-core';
 import WalletConnect from '../components/walletconnect';
 import Link from "next/link";
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const { user, primaryWallet } = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext(); // ✅ thêm getAuthToken
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    if (isAuthenticated && primaryWallet) {
-      console.log('Redirecting to user dashboard...');
-      router.push('./user'); // Redirect tạm thời để test (yêu cầu xét thêm role id sau khi login)
+     const handleLogin = async () => {
+      if (isAuthenticated && primaryWallet && user?.email) {
+        try {
+          const token = await getAuthToken();
+          localStorage.setItem('auth_token', token);
+          console.log("JWT token:", token);
+          if (token) {
+            localStorage.setItem('auth_token', token);
+          } else {
+            throw new Error('No token received');
+          }
+
+          // Gọi API backend để xác thực token
+          const API_URL = process.env.NEXT_PUBLIC_API_URL;
+          const res = await fetch(`${API_URL}/api/users/me`, {
+            method: 'GET',
+            headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            },
+            credentials: 'include'
+          });
+
+          const data = await res.json();
+          console.log("Server response:", data);
+
+          // Kiểm tra role để redirect
+           if (data && data.role) {
+          switch (data.role) {
+            case "admin_root":
+              router.push("/admin/root");
+              break;
+            case "org":
+              router.push("/admin/org");
+              break;
+            case "admin_org":
+              router.push("/admin/admin_org");
+              break;
+            default:
+              router.push("/user");
+          }
+        } else {
+          router.push("/user"); // Nếu không có role, đưa về trang user
+        }
+        } catch (error) {
+          console.error("Login failed:", error);
+        }
+      }
     }
-  }, [isAuthenticated, primaryWallet, router]);
+    handleLogin();
+  }, [isAuthenticated, primaryWallet, user?.email]);
 
   return (
  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
@@ -187,8 +235,8 @@ const Login: React.FC = () => {
             </div>
           </div>
         </div>
-        <WalletConnect />
       </div>
+      <DynamicWidget />
     </div>
     
   );
