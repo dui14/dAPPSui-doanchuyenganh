@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const { user, primaryWallet } = useDynamicContext(); // ✅ thêm getAuthToken
+  const { user, primaryWallet } = useDynamicContext(); 
   const isAuthenticated = !!user;
 
   useEffect(() => {
@@ -42,13 +42,13 @@ const Login: React.FC = () => {
            if (data && data.role) {
           switch (data.role) {
             case "admin_root":
-              router.push("/admin/root");
+              router.push("/root");
               break;
             case "org":
-              router.push("/admin/org");
+              router.push("/org");
               break;
             case "admin_org":
-              router.push("/admin/admin_org");
+              router.push("/admin_org");
               break;
             default:
               router.push("/user");
@@ -157,7 +157,7 @@ const Login: React.FC = () => {
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 max-w-md mx-auto">
                     <div className="flex items-center space-x-2 mb-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                      <span className="text-blue-400 font-medium">Connected</span>
+                      <span className="text-blue-400 font-medium">Please Connect 1 more Sui Address</span>
                     </div>
                     <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-gray-300 break-all">
                       {primaryWallet?.address}

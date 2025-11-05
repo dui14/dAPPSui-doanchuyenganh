@@ -1,14 +1,13 @@
 dapp-sui/
 │
-├── public/
-│
-├── pages/
+├public/  
+│ pages/
 │   ├── index.tsx           # Landing / Home
 │
 │   ├── admin/
 │   │   ├── root.tsx        # Admin Root (Bộ)
 │   │   ├── org.tsx         # Org (Trường)
-│   │   └── admin_org.tsx      # Admin (Trường)
+│   │   └── admin_org.tsx      # Admin (Khoa)
 │
 │   ├── user.tsx            # User (Sinh viên)
 │
@@ -46,11 +45,19 @@ dapp-sui/
 │
 ├backend             # Node.js / Express (giữ nguyên style cũ)
 │   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   ├── middleware/
+│   │   │   └── auth.js
 │   │   ├── routes/
-│   │   │   ├── certificate.js   # Upload file, metadata, create request
-│   │   │   ├── verify.js        # Truy vấn chứng chỉ
-│   │   │   └── org.js           # Quản lý org
+│   │   │   ├── auth.js
+│   │   │   ├── user.js    
+│   │   │   ├── certificate.js      # Upload file, metadata, create request
+│   │   │   ├── verify.js           # Truy vấn chứng chỉ
+│   │   │   └── organizations.js    # Quản lý org
 │   │   ├── services/
+│   │   │   ├── cache.js  
+│   │   │   ├── jwt.js  
 │   │   │   ├── ipfs.js
 │   │   │   ├── db.js
 │   │   │   └── sign.js          # Ký metadata, handle signature
@@ -58,7 +65,7 @@ dapp-sui/
 │   ├── package.json
 │
 ├── database/
-│   ├── schema.sql          
+│   ├── db1.sql          
 │   └── models/
 │
 └── docs/

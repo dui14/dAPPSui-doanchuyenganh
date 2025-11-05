@@ -1,6 +1,7 @@
 # Đề tài: Xây dựng hệ thống quản lý và xác thực chứng chỉ học tập phi tập trung trên Sui Blockchain
-1. Tree
-/docs/architecture.md
+
+## 1. Tree
+Xem chi tiết kiến trúc hệ thống tại:[/docs/architecture.md](/docs/architecture.md)
 
 # Cài env, package và SUI CLI
 1. SUI CLI (https://docs.sui.io/guides/developer/getting-started)
@@ -8,7 +9,7 @@
 - Sau khi cài gõ sui --version để kiểm tra 
 
 2. Cài package và các module
-cd public
+cd public và cd src
 npm install
 
 3. Sau khi cài kiểm tra
@@ -43,5 +44,9 @@ Tạo \suidapp\.env
 - DB_PASSWORD=your_password
 - DB_SERVER=localhost
 - DB_NAME=your_database
+- JWT_PUBLIC_KEY_URL=https://app.dynamic.xyz/api/v0/sdk/7e2c57a4-316f-467f-b11a-cafc5df99993/.well-known/jwks
 
-+ JWT_PUBLIC_KEY_URL=https://app.dynamic.xyz/api/v0/sdk/7e2c57a4-316f-467f-b11a-cafc5df99993/.well-known/jwks
+## RUN cùng lúc
+connect Database
+src/node app.js
+public/npm run dev

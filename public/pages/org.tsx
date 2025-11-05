@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDynamicContext, getAuthToken } from '@dynamic-labs/sdk-react-core';
+import Link from "next/link";
+import Account from "../components/account";
 
 export default function RootPage() {
   const router = useRouter();
@@ -35,7 +37,7 @@ export default function RootPage() {
         const data = await response.json();
         
         // Check role from database
-        if (data.role !== 'admin_root') {
+        if (data.role !== 'org') {
           router.push('/login');
           return;
         }
@@ -59,7 +61,7 @@ export default function RootPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-800">
       <header className="w-full p-4 bg-gray-900 text-white text-center text-2xl font-semibold shadow">
-        🌐 Root Dashboard
+        🌐 ORG Dashboard
       </header>
 
       <main className="mt-10 flex flex-col items-center gap-4">
@@ -69,6 +71,7 @@ export default function RootPage() {
           <p><strong>Email:</strong> {userData.email}</p>
           <p><strong>Wallet:</strong> {primaryWallet?.address || 'No wallet connected'}</p>
         </div>
+         <Account />
       </main>
     </div>
   );

@@ -36,10 +36,21 @@ async function authenticate(req, res, next) {
       });
     }
     
-    // Kiểm tra email từ token
-    if (!decoded.email) {
-      return res.status(401).json({ error: 'Invalid token - no email found' });
+    // Lấy địa chỉ ví từ verified_credentials
+    let walletAddress = null;
+    if (decoded.verified_credentials) {
+      const suiWallet = decoded.verified_credentials.find(
+        cred => cred.chain === 'sui' && cred.format === 'blockchain'
+      );
+      if (suiWallet) {
+        walletAddress = suiWallet.address;
+      }
     }
+    
+    // // Kiểm tra email từ token
+    // if (!decoded.email) {
+    //   return res.status(401).json({ error: 'Invalid token - no email found' });
+    // }
 
     // Tìm user trong database
     let user = await db.getUserByEmail(decoded.email);
@@ -55,6 +66,10 @@ async function authenticate(req, res, next) {
 
       user = await db.createUser(newUser);
       console.log('Created new user:', user);
+    } else if (walletAddress && user.wallet_address !== walletAddress) {
+      // Cập nhật wallet_address nếu thay đổi
+      await db.updateUserWallet(user.id, walletAddress);
+      user.wallet_address = walletAddress;
     }
 
     // Cache user data

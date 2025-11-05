@@ -38,4 +38,30 @@ router.put('/:id/role', authenticate, async (req, res) => {
   }
 });
 
+// Cập nhật wallet address
+router.put('/wallet', authenticate, async (req, res) => {
+  try {
+    const { wallet_address } = req.body;
+    const userId = req.user.id;
+
+    await db.updateUserWallet(userId, wallet_address);
+    
+    // Cập nhật cache
+    const token = req.headers.authorization.split(' ')[1];
+    const cachedUser = userCache.get(token);
+    if (cachedUser) {
+      cachedUser.wallet_address = wallet_address;
+      userCache.set(token, cachedUser);
+    }
+
+    res.json({ 
+      success: true,
+      wallet_address 
+    });
+  } catch (error) {
+    console.error('Error updating wallet:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
