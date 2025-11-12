@@ -1,13 +1,11 @@
+// middleware/auth.js
 const { verifyToken } = require('../services/jwt');
 const db = require('../services/db');
 const { userCache } = require('../services/cache');
 
 async function authenticate(req, res, next) {
   try {
-    // Lấy token từ header Authorization
     const authHeader = req.headers.authorization;
-    console.log('Auth header:', authHeader);
-
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ 
         error: 'Token required',
@@ -16,7 +14,7 @@ async function authenticate(req, res, next) {
     }
 
     const token = authHeader.split(' ')[1];
-    console.log('Token received:', token.substring(0, 20) + '...'); // Log một phần token
+    console.log('Token received (first 20):', token.substring(0, 20) + '...');
 
     // Kiểm tra cache
     const cachedUser = userCache.get(token);
@@ -25,63 +23,50 @@ async function authenticate(req, res, next) {
       return next();
     }
 
-    // Verify JWT token từ Dynamic
+    // Verify JWT từ Dynamic Labs
     const decoded = await verifyToken(token);
-    console.log('Decoded token:', decoded); 
-
     if (!decoded.email) {
-      return res.status(401).json({ 
-        error: 'Invalid token',
-        details: 'No email in token'
-      });
+      return res.status(401).json({ error: 'Invalid token - no email' });
     }
-    
-    // Lấy địa chỉ ví từ verified_credentials
+
+    // Lấy wallet address từ verified_credentials
     let walletAddress = null;
     if (decoded.verified_credentials) {
       const suiWallet = decoded.verified_credentials.find(
         cred => cred.chain === 'sui' && cred.format === 'blockchain'
       );
-      if (suiWallet) {
-        walletAddress = suiWallet.address;
-      }
+      if (suiWallet) walletAddress = suiWallet.address;
     }
-    
-    // // Kiểm tra email từ token
-    // if (!decoded.email) {
-    //   return res.status(401).json({ error: 'Invalid token - no email found' });
-    // }
 
-    // Tìm user trong database
+    // Tìm user trong DB
     let user = await db.getUserByEmail(decoded.email);
 
-    // Nếu user chưa tồn tại, tạo mới với role 'user'
+    // Nếu chưa có → tạo mới
     if (!user) {
       const newUser = {
         email: decoded.email,
         display_name: decoded.name || decoded.email.split('@')[0],
-        wallet_address: decoded.walletAddress || null,
-        role: 'user' // Mặc định role là user
+        wallet_address: walletAddress || null,
+        role: 'user' // Chỉ gán khi tạo mới
       };
-
       user = await db.createUser(newUser);
-      console.log('Created new user:', user);
-    } else if (walletAddress && user.wallet_address !== walletAddress) {
-      // Cập nhật wallet_address nếu thay đổi
-      await db.updateUserWallet(user.id, walletAddress);
-      user.wallet_address = walletAddress;
+      console.log('Created new user:', user.id);
+    } else {
+      // Cập nhật wallet nếu thay đổi
+      if (walletAddress && user.wallet_address !== walletAddress) {
+        await db.updateUserWallet(user.id, walletAddress);
+        user.wallet_address = walletAddress;
+      }
+      // → KHÔNG GÁN role = 'user' ở đây nữa!
     }
 
-    // Cache user data
+    // Cache user
     userCache.set(token, user);
     req.user = user;
     next();
-  }  catch (error) {
+  } catch (error) {
     console.error('Auth error:', error);
-    res.status(401).json({ 
-      error: 'Authentication failed',
-      details: error.message 
-    });
+    res.status(401).json({ error: 'Authentication failed', details: error.message });
   }
 }
 
