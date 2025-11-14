@@ -161,3 +161,78 @@ ORDER BY id;
 
 SELECT id, org_name, org_email, owner_id, status
 FROM dbo.organizations;
+
+
+-- BƯỚC 1: TẠO TÀI KHOẢN BỘ GIÁO DỤC (role: admin_root)
+IF NOT EXISTS (SELECT 1 FROM dbo.users WHERE email = 'bo@giaoduc.vn')
+BEGIN
+    INSERT INTO dbo.users (email, display_name, role, status, wallet_address)
+    VALUES (
+        'luongkhang156@gmail.com', 
+        'Bộ Giáo dục & Đào tạo', 
+        'admin_root', 
+        'active',
+        '0xde85db2440be6d97eebdfa7a0dce84bf4bf4dc1ca0abed4cf586461cbb26aee0'  -- Ví mẫu của Bộ
+    );
+    PRINT 'Tạo tài khoản Bộ thành công: luongkhang156@gmail.com';
+END
+ELSE
+BEGIN
+    PRINT 'Tài khoản luongkhang156@gmail.com đã tồn tại';
+END
+GO
+
+-- BƯỚC 2: TẠO TỔ CHỨC "BỘ GIÁO DỤC & ĐÀO TẠO" (id = 999 để phân biệt)
+IF NOT EXISTS (SELECT 1 FROM dbo.organizations WHERE org_email = 'luongkhang156@gmail.com')
+BEGIN
+    -- Lấy user_id của Bộ vừa tạo
+    DECLARE @bo_user_id INT = (SELECT id FROM dbo.users WHERE email = 'luongkhang156@gmail.com');
+
+    SET IDENTITY_INSERT dbo.organizations ON;
+    INSERT INTO dbo.organizations (id, org_name, org_email, owner_id, org_wallet, status)
+    VALUES (
+        999, 
+        'Bộ Giáo dục và Đào tạo Việt Nam', 
+        'luongkhang156@gmail.com', 
+        @bo_user_id,
+        '0xde85db2440be6d97eebdfa7a0dce84bf4bf4dc1ca0abed4cf586461cbb26aee0',
+        'approved'
+    );
+    SET IDENTITY_INSERT dbo.organizations OFF;
+
+    PRINT 'Tạo tổ chức Bộ Giáo dục thành công (id = 999)';
+END
+GO
+
+-- BƯỚC 3: CẬP NHẬT org_id cho user Bộ (nếu cần)
+UPDATE dbo.users 
+SET org_id = 999 
+WHERE email = 'luongkhang156@gmail.com';
+GO
+
+-- BƯỚC 4: KIỂM TRA KẾT QUẢ (CHẠY ĐỂ XEM)
+PRINT '=== DANH SÁCH TÀI KHOẢN QUAN TRỌNG ===';
+SELECT 
+    id, 
+    email, 
+    display_name, 
+    role, 
+    org_id,
+    wallet_address
+FROM dbo.users 
+WHERE role IN ('org', 'admin_org', 'admin_root')
+ORDER BY role DESC;
+
+PRINT '=== DANH SÁCH TỔ CHỨC ===';
+SELECT 
+    id, 
+    org_name, 
+    org_email, 
+    owner_id, 
+    status 
+FROM dbo.organizations 
+ORDER BY id;
+GO
+
+ALTER TABLE dbo.certificates 
+ADD tx_hash NVARCHAR(255) NULL;
