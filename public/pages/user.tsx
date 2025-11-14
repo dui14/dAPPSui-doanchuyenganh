@@ -1,9 +1,9 @@
 "use client";
 
-import { useCurrentAccount } from "@mysten/dapp-kit";
+
 import { useState } from 'react';
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
+
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import WalletConnect from '../components/walletconnect';
 import Link from "next/link";
@@ -11,6 +11,30 @@ import Account from '../components/account';
 
 export default function StudentPage() {
     const { user, primaryWallet } = useDynamicContext();
+    const [activeTab, setActiveTab] = useState('overview');
+    const [requests, setRequests] = useState([]);
+    const [formData, setFormData] = useState({
+      certificateType: '',
+      description: '',
+      files: []
+    });
+
+    useEffect(() => {
+      if (user && activeTab === 'requests') {
+        fetchUserRequests();
+      }
+    }, [user, activeTab]);
+
+    const fetchUserRequests = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/certificates/requests`);
+        const data = await response.json();
+        const userRequests = data.filter(req => req.student_email === user?.email);
+        setRequests(userRequests);
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      }
+    };
 
   if (!user) {
     return (
@@ -25,6 +49,54 @@ export default function StudentPage() {
       </div>
     );
   }
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setFormData(prev => ({ ...prev, files }));
+  };
+
+  // Trong handleSubmitRequest
+  const handleSubmitRequest = async () => {
+    if (!formData.certificateType || !formData.description) {
+      alert('Vui lòng điền đầy đủ thông tin!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/certificates/requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          student_email: user?.email,
+          org_id: 1, // ← Gửi org_id
+          certificate_type: formData.certificateType,
+          description: formData.description,
+          ipfs_cid_list: [] // ← Gửi mảng rỗng
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`Gửi yêu cầu thành công! Mã yêu cầu: ${result.request_code}`);
+        setFormData({ certificateType: '', description: '', files: [] });
+        setActiveTab('requests');
+        fetchUserRequests(); // Refresh danh sách
+      } else {
+        alert(`Lỗi: ${result.error || 'Có lỗi xảy ra!'}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Lỗi kết nối server!');
+    }
+  };
+
+  const handleClaimCertificate = (certId) => {
+    // TODO: Implement NFT claim to wallet
+    alert(`Nhận chứng chỉ ${certId} về ví thành công!`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
@@ -51,7 +123,9 @@ export default function StudentPage() {
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 mb-8 text-white fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Xin chào, Nguyễn Văn A! 👋</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                  Xin chào, {user?.name || user?.email?.split('@')[0] || 'Bạn'}!
+              </h1>
               <p className="text-purple-100 mb-4">Chào mừng bạn đến với hệ thống quản lý chứng chỉ</p>
               <div className="bg-white/20 rounded-lg p-3 inline-block">
                 {primaryWallet?.address && (<p className="text-sm font-mono">{primaryWallet.address}</p>)}
@@ -101,15 +175,44 @@ export default function StudentPage() {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-2xl shadow-lg mb-8 scale-in">
+          <div className="flex border-b">
+            <button 
+              onClick={() => setActiveTab('overview')}
+              className={`px-6 py-4 font-medium ${activeTab === 'overview' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+            >
+              📊 Tổng quan
+            </button>
+            <button 
+              onClick={() => setActiveTab('create')}
+              className={`px-6 py-4 font-medium ${activeTab === 'create' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+            >
+              ➕ Tạo yêu cầu
+            </button>
+            <button 
+              onClick={() => setActiveTab('requests')}
+              className={`px-6 py-4 font-medium ${activeTab === 'requests' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+            >
+              📋 Danh sách đã yêu cầu
+            </button>
+            <button 
+              onClick={() => setActiveTab('claim')}
+              className={`px-6 py-4 font-medium ${activeTab === 'claim' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+            >
+              🎯 Nhận chứng chỉ về ví
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Certificates */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg p-6 scale-in">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Chợng chỉ của tôi</h2>
-                <button className="btn-primary text-sm py-2 px-4">
-                  + Yêu cầu mới
-                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Chứng chỉ của tôi</h2>
               </div>
               
               <div className="space-y-4">
@@ -225,6 +328,177 @@ export default function StudentPage() {
             </div>
           </div>
         </div>
+        )}
+
+        {/* Create Request Tab */}
+        {activeTab === 'create' && (
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Tạo yêu cầu chứng chỉ mới</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Loại chứng chỉ</label>
+                  <select 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    value={formData.certificateType}
+                    onChange={(e) => setFormData(prev => ({...prev, certificateType: e.target.value}))}
+                  >
+                    <option value="">Chọn loại chứng chỉ</option>
+                    <option value="bachelor">Bằng Cử nhân</option>
+                    <option value="master">Bằng Thạc sĩ</option>
+                    <option value="certificate">Chứng chỉ hoàn thành</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+                  <textarea 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    rows="4"
+                    placeholder="Nhập mô tả chi tiết về chứng chỉ..."
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tài liệu đính kèm</label>
+                  <input 
+                    type="file" 
+                    multiple
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    onChange={handleFileUpload}
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Hỗ trợ: PDF, JPG, PNG (tối đa 10MB)</p>
+                </div>
+
+                <button 
+                  onClick={handleSubmitRequest}
+                  className="w-full btn-primary py-3"
+                >
+                  📤 Gửi yêu cầu
+                </button>
+              </div>
+
+              <div className="bg-blue-50 rounded-xl p-6">
+                <h3 className="font-bold text-blue-800 mb-4">📋 Quy trình phê duyệt</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">1</div>
+                    <span className="text-sm">Khoa xem xét và phê duyệt</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">2</div>
+                    <span className="text-sm">Trường xác nhận</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">3</div>
+                    <span className="text-sm">Bộ ký và cấp chứng chỉ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Requests List Tab */}
+        {activeTab === 'requests' && (
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Danh sách đã yêu cầu</h2>
+            
+            <div className="space-y-4">
+              {requests.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="text-4xl mb-4">📋</div>
+                  <p>Chưa có yêu cầu nào</p>
+                </div>
+              ) : (
+                requests.map((request) => {
+                  const requestData = request.note ? JSON.parse(request.note) : {};
+                  const statusColor = {
+                    'pending': 'orange',
+                    'org_checked': 'blue', 
+                    'org_approved': 'purple',
+                    'root_signed': 'green',
+                    'minted': 'green',
+                    'rejected': 'red'
+                  }[request.status] || 'gray';
+
+                  return (
+                    <div key={request.id} className={`border border-${statusColor}-200 rounded-xl p-6 bg-${statusColor}-50`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="font-bold text-lg">{requestData.certificate_type || 'Chứng chỉ'}</h3>
+                          <p className="text-gray-600">Mã yêu cầu: {request.request_code}</p>
+                        </div>
+                        <span className={`bg-${statusColor}-500 text-white px-3 py-1 rounded-full text-sm`}>
+                          {request.status === 'pending' ? 'Chờ duyệt' : 
+                           request.status === 'org_checked' ? 'Khoa đã duyệt' :
+                           request.status === 'org_approved' ? 'Trường đã duyệt' :
+                           request.status === 'root_signed' ? 'Bộ đã ký' :
+                           request.status === 'minted' ? 'Hoàn thành' : 'Từ chối'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <p><strong>Ngày gửi:</strong> {new Date(request.created_at).toLocaleDateString('vi-VN')}</p>
+                        <p><strong>Trạng thái:</strong> {request.status}</p>
+                        <p><strong>Mô tả:</strong> {requestData.description || 'Không có'}</p>
+                        <p><strong>Cập nhật:</strong> {new Date(request.updated_at).toLocaleDateString('vi-VN')}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Claim Certificate Tab */}
+        {activeTab === 'claim' && (
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Nhận chứng chỉ về ví cá nhân</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-bold mb-4">Chứng chỉ sẵn sàng nhận</h3>
+                <div className="space-y-4">
+                  <div className="border-2 border-green-200 rounded-xl p-6 bg-green-50">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="font-bold text-green-800">Bằng Cử nhân CNTT</h4>
+                        <p className="text-sm text-gray-600">Đã được phê duyệt và ký</p>
+                      </div>
+                      <div className="text-2xl">🏅</div>
+                    </div>
+                    <button 
+                      onClick={() => handleClaimCertificate('CER001234')}
+                      className="w-full btn-primary"
+                    >
+                      🎯 Nhận về ví
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 rounded-xl p-6">
+                <h3 className="font-bold text-purple-800 mb-4">💡 Hướng dẫn</h3>
+                <div className="space-y-3 text-sm">
+                  <p>• Chứng chỉ sẽ được mint thành NFT SoulBound Token</p>
+                  <p>• NFT sẽ được gửi trực tiếp vào ví Sui của bạn</p>
+                  <p>• Chứng chỉ NFT không thể chuyển nhượng</p>
+                  <p>• Bạn có thể xem và chia sẻ chứng chỉ bất cứ lúc nào</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <footer className="mt-16 bg-white/50 rounded-2xl p-6 text-center">
+          <p className="text-gray-600">© 2024 EduChain - Hệ thống chứng chỉ Blockchain</p>
+          <p className="text-sm text-gray-500 mt-2">Được xây dựng trên Sui Network</p>
+        </footer>
       </div>
     </div>
   );
