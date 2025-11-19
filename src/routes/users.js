@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { authenticate } = require('../middleware/auth');
 const db = require('../services/db');
+const { userCache } = require('../services/cache');
 
 // Lấy thông tin user hiện tại
 router.get('/me', authenticate, async (req, res) => {
@@ -44,9 +45,10 @@ router.put('/wallet', authenticate, async (req, res) => {
     const { wallet_address } = req.body;
     const userId = req.user.id;
 
+    // Cập nhật trong database
     await db.updateUserWallet(userId, wallet_address);
     
-    // Cập nhật cache
+    // ✅ Cập nhật cache (đã import userCache ở trên)
     const token = req.headers.authorization.split(' ')[1];
     const cachedUser = userCache.get(token);
     if (cachedUser) {

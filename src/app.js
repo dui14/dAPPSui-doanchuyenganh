@@ -31,7 +31,8 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
-// app.use('/api/organizations', require('./routes/organizations'));
+app.use('/api/certificates', require('./routes/certificates'));
+app.use('/api/organizations', require('./routes/organizations'));
 
 // Error handler
 app.use((err, req, res, next) => {

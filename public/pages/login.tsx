@@ -39,7 +39,7 @@ const Login: React.FC = () => {
           console.log("Server response:", data);
 
           // Kiểm tra role để redirect
-           if (data && data.role) {
+          if (data && data.role) {
           switch (data.role) {
             case "admin_root":
               router.push("/root");
@@ -56,6 +56,7 @@ const Login: React.FC = () => {
         } else {
           router.push("/user"); // Nếu không có role, đưa về trang user
         }
+        
         } catch (error) {
           console.error("Login failed:", error);
         }

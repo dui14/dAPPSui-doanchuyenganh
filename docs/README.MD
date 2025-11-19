@@ -46,6 +46,11 @@ Tạo \suidapp\.env
 - DB_NAME=your_database
 - JWT_PUBLIC_KEY_URL=https://app.dynamic.xyz/api/v0/sdk/7e2c57a4-316f-467f-b11a-cafc5df99993/.well-known/jwks
 
++ Tạo API key (trên Pinata IPFS)
+- PINATA_API_KEY=key
+- PINATA_SECRET_KEY=key
+- PINATA_JWT=
+
 ## RUN cùng lúc
 connect Database
 src/node app.js

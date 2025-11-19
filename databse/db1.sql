@@ -39,6 +39,7 @@ CREATE TABLE dbo.certificates (
     org_id INT NOT NULL,                         -- tổ chức phát hành
     ipfs_cid NVARCHAR(255) NULL,                 -- metadata file (IPFS)
     status NVARCHAR(20) DEFAULT 'minted',        -- trạng thái NFT
+    tx_hash NVARCHAR(255) NULL,
     created_at DATETIME2 DEFAULT SYSUTCDATETIME(),
     CONSTRAINT fk_cert_org FOREIGN KEY (org_id) REFERENCES dbo.organizations(id) ON DELETE CASCADE,
     CONSTRAINT chk_cert_status CHECK (status IN ('minted','revoked'))

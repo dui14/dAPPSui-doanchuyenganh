@@ -47,8 +47,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             if (args.authToken) {
               localStorage.setItem('auth_token', args.authToken);
               console.log('JWT token saved:', args.authToken);
-                            // Cập nhật wallet address vào DB
-              try {
+              // Cập nhật wallet address vào DB
+              try { 
                 const API_URL = process.env.NEXT_PUBLIC_API_URL;
                 await fetch(`${API_URL}/api/users/wallet`, {
                   method: 'PUT',
