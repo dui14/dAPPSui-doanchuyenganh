@@ -1,0 +1,166 @@
+.page {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    padding: 24px;
+    background: #f7fafc;
+    min-height: 100vh;
+    color: #0f172a;
+}
+
+.header {
+    margin-bottom: 18px;
+}
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+    }
+
+    .header .subtitle {
+        color: #64748b;
+        margin-top: 6px;
+    }
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 18px;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .form label {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.95rem;
+        color: #334155;
+    }
+
+        .form label input,
+        .form label textarea {
+            margin-top: 6px;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+    .form .formActions {
+        margin-top: 8px;
+    }
+
+        .form .formActions button {
+            background: #0ea5a4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+            .form .formActions button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+    .list .empty {
+        color: #94a3b8;
+        padding: 12px 0;
+    }
+
+    .list .item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eef2f6;
+    }
+
+        .list .item .meta {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .list .item .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .list .item button {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+.badge {
+    padding: 6px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: capitalize;
+}
+
+.pending {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fef3c7;
+}
+
+.approved {
+    background: #ecffe6;
+    color: #065f46;
+    border: 1px solid #bbf7d0;
+}
+
+.rejected {
+    background: #fff1f2;
+    color: #9f1239;
+    border: 1px solid #fecaca;
+}
+
+.claimed {
+    background: #eef2ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
+}
+
+.footer {
+    margin-top: 18px;
+    text-align: center;
+    color: #94a3b8;
+}
